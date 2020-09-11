@@ -1,67 +1,42 @@
-;;; ~/.doom.d/+ui.el -*- lexical-binding: t; -*-
+;; ~/.doom.d/+ui.el -*- lexical-binding: t; -*-
 
 (defadvice load-theme (before theme-dont-propagate activate)
   "Disable theme before loading new one."
   (mapc #'disable-theme custom-enabled-themes))
 
-;; Font setup
+;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
+;; are the three important ones:
+;;
+;; + `doom-font'
+;; + `doom-variable-pitch-font'
+;; + `doom-big-font' -- used for `doom-big-font-mode'; use this for
+;;   presentations or streaming.
+;;
+;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
+;; font string. You generally only need these two:
+;; (setq doom-font (font-spec :family "monospace" :size 12 :weight 'semi-light)
+;;       doom-variable-pitch-font (font-spec :family "sans" :size 13))
 (setq doom-font (font-spec :family "Fira Mono" :size 14)
       doom-big-font (font-spec :family "Fira Mono" :size 19))
 
-;; Use different color theme
-;; (setq doom-theme 'doom-opera-light)
+;; There are two ways to load a theme. Both assume the theme is installed and
+;; available. You can either set `doom-theme' or manually load a theme with the
+;; `load-theme' function. This is the default:
+(setq doom-theme 'doom-one)
 
 ;; macosx transparent titlebar
 (when (eq system-type 'darwin)
   (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
   (add-to-list 'default-frame-alist '(ns-appearance . dark)))
 
-(def-package! page-break-lines
+;; This determines the style of line numbers in effect. If set to `nil', line
+;; numbers are disabled. For relative line numbers, set this to `relative'.
+(setq display-line-numbers-type t)
+
+(use-package! page-break-lines
   :config
   (progn
     (add-to-list 'page-break-lines-modes 'org-agenda-mode)
     (global-page-break-lines-mode t)))
-
-(def-package! olivetti
-  :init
-  :config
-  (progn
-    (setq olivetti-hide-mode-line t)))
-
-(defun turn-off-prose-mode ()
-  (interactive)
-  (set-face-attribute 'variable-pitch nil :family "Fira Mono")
-  (load-theme 'doom-one t)
-  (olivetti-mode 0))
-
-(defun turn-on-prose-mode ()
-  (interactive)
-  (load-theme 'poet-dark-monochrome t)
-  (set-face-attribute 'variable-pitch nil :family "Baskerville")
-  (set-face-attribute 'default nil :family "Fira Mono" :height 140)
-  (set-face-attribute 'fixed-pitch nil :family "Fira Mono")
-  (display-line-numbers-mode 0)
-  (vi-tilde-fringe-mode 0)
-  (turn-on-olivetti-mode)
-  (olivetti-set-width 100))
-
-(setq toni/prose-mode-loaded nil)
-(defun toni/load-theme ()
-  (interactive)
-  (when (derived-mode-p 'text-mode)
-    (when (not toni/prose-mode-loaded)
-      (progn
-        (turn-on-prose-mode)
-        (setq toni/prose-mode-loaded t))))
-  (when (derived-mode-p 'prog-mode)
-    (when toni/prose-mode-loaded
-      (progn
-        (turn-off-prose-mode)
-        (setq toni/prose-mode-loaded nil)))))
-
-(add-hook 'post-command-hook 'toni/load-theme)
-(add-hook 'text-mode-hook
-          (lambda ()
-            (variable-pitch-mode 1)))
 
 (provide '+ui)
