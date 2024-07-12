@@ -57,3 +57,5 @@
 (package! org-gcal)
 (package! page-break-lines)
 (package! super-save)
+
+(package! dape)
